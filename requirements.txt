@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+pillow
+requests
+google-genai
+python-multipart
