@@ -1,0 +1,619 @@
+/* ==================== */
+/* ------FE6--SC------- */
+/* ==================== */
+var urunDuzeniTipi=0; 
+var mobilBlokCozunurluk=768; 
+var sliderZoomCozunurluk=768; 
+var isHoverCartProduct=false; 
+var kategoriMenuAcikGetir=true; 
+var urunDetayZoomCozunurluk=768; 
+var windowidth=document.documentElement.clientWidth; 
+var urunDetay_varyasyonSecili=true; 
+
+$(document).ready(function () {
+    if($('.cariOdemeContainer').length > 0){
+        $('.navigation .navUl').wrapAll('<div></div>');
+    }
+    
+    setTimeout(function () { loadStyle("https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap&subset=latin-ext", function () { }); }, 500);
+    
+    if ($('#divSayfalamaUst').length>0) { KategoriIslemleri(); }
+    else if (globalModel.pageType == 'productdetail') {UrunDetayIslemleri(); }
+    else if (globalModel.pageType == 'cart' || globalModel.pageType == 'ordercomplete' || globalModel.pageType == 'payment' || globalModel.pageType == 'ordercompleted') { SepetEkrani(); }
+    if ($('.pageContainer').length > 0) {$('body').addClass('SayfaIcerik');}
+    if ($('.magazalarContent').length > 0) {$('body').addClass('Magazalar');}
+    GlobalIslemler();
+});
+function GlobalIslemler() {
+    if (!pageInitialized) {
+        if (windowidth>767){
+            $('.welcome').after('<div class="icons"></div>');
+            $('.welcome').appendTo('.icons');
+            $('.mycart').insertBefore('.welcome');
+            $('#lang_flag_container').insertAfter('.welcome');
+            $('.htop').insertBefore('.headerContent');
+        }
+        $('.mycart').after('<div class="arabtn" ><i class="fal fa-search"></i></div>');
+        if (windowidth<768) {$('.arabtn').insertBefore('#logo'); }
+        $('body').on('click','.arabtn',function(){$('.searchContent').toggleClass('active'); });
+        $('body').on('click',function (evt) {if (!$(evt.target).is('.arabtn,.arabtn i,.searchContent,.searchContent *')) {$('.searchContent').removeClass('active'); } });
+        $('#divNewsLetter').prependTo('.ebultenGelecek');
+    }
+    sayfaTasarim();
+    $('#instaStories').insertAfter('.welcome');
+}
+function KategoriIslemleri() {
+    $('.categoryTitle .categoryTitleText').prependTo('.categoryContainer');
+    if (windowidth > 1041) {$('body').on('click','.leftBlock .category-vertical-filters .panel .panel-heading',function(event) {$(this).parent().find('.list-group, .slider-range, .amount').slideToggle(); $(this).toggleClass('active'); }); }
+}
+function UrunDetayIslemleri() {
+    if (productDetailModel.totalStockAmount < 1) {$('.RightDetail').addClass('StokYok');}
+    if (!pageInitialized) {
+        $('.ProductDetailMain').prepend('<div class="TopDet"></div>');
+        
+        $('.ProductDetail > .categoryTitle').insertBefore('#divIcerik');
+        $('.leftImage').appendTo('.TopDet');
+        $('.RightDetail').appendTo('.TopDet');
+        
+        $('.RightDetail').prepend('<div class="TopList"></div>');
+        $('.PriceList').prependTo('.TopList');
+        $('.ProductName').prependTo('.TopList');
+        
+        $('.TopList').after('<div class="MiddleList"></div>');
+        $('#divSatinAl').appendTo('.MiddleList');
+        $('#divUrunEkSecenek').prependTo('.MiddleList');
+        $('#divStokYok').prependTo('.MiddleList');
+        
+        $('.MiddleList').after('<div class="BottomList"></div>');
+        $('.ProductIcon').appendTo('.BottomList');
+        $('.ProductIcon2 ').appendTo('.BottomList');
+        $('#divEkstraBilgiler').appendTo('.BottomList');
+        $('.product_social_icon_wrapper').appendTo('.BottomList');
+        
+        $('.markaresmi').insertBefore('.ProductName');
+        $('#divOnyazi').insertAfter('.ProductName');
+        $('#divMagazaStok').insertAfter('.ProductName');
+        $('#divTahminiTeslimatSuresi').insertAfter('.ProductName');
+        $('#divIndirimOrani').insertAfter('.ProductName');
+        $('#divParaPuan').insertAfter('.ProductName');
+        $('#divToplamStokAdedi').insertAfter('.ProductName');
+        $('#divUrunStokAdedi').insertAfter('.ProductName');
+        $('#divTedarikci').insertAfter('.ProductName');
+        $('#divBarkod').insertAfter('.ProductName');
+        $('.puanVer').insertAfter('.ProductName');
+        $('#divMarka').insertAfter('.ProductName');
+        $('#divUrunKodu').insertAfter('.ProductName');
+        
+        $('.riSingle .riUp').html('<i class="far fa-plus"></i>');
+        $('.riSingle .riDown').html('<i class="far fa-minus"></i>');
+        $('.buyfast').insertAfter('.basketBtn');
+        $('#divAdetCombo').insertBefore('.basketBtn');
+        $('#divTaksitAciklama').insertAfter('#pnlFiyatlar');    
+        $('.UWhatsApp').insertAfter('.product_social_icon_wrapper li:last-child');
+        $('#divKombinSatinAl').insertAfter('.basketBtn');
+        
+        $('#divIndirimOrani').insertAfter('#pnlFiyatlar');
+        $('#divTaksitAciklama').insertAfter('.PriceList');
+        $('#divMarka').insertAfter('.PriceList');
+        if (windowidth>767) {
+            $('.UFavorilerimeEkle').insertAfter('.basketBtn');
+        }else{
+            $('#divUrunKodu').insertAfter('.PriceList');
+            $('.UFavorilerimeEkle').appendTo('.leftImage');
+            $('body').on('click',".basketBtn,.UFavorilerimeEkle a",function () {if ($("#hddnUrunID").val() == "0") {$('html,body').animate({scrollTop: $('#divUrunEkSecenek').offset().top - 110 }, 'slow'); } });
+        }
+        setTimeout(function() {tooltips(); },1500);
+        $('body').on('click','.FiyatHaberVer a',function(){setTimeout(function() {tooltips(); },100); });
+        // ========================================================
+        // ULINO AI SANAL KABİN SİSTEMİ (PREMIUM MODA KONSEPTİ)
+        // ========================================================
+        
+        if ($('#ulino-ai-modal').length === 0) {
+            let modalHTML = `
+            <div id="ulino-ai-modal" style="display:none; position:fixed; z-index:999999; left:0; top:0; width:100%; height:100%; background:rgba(255,255,255,0.85); backdrop-filter:blur(10px); justify-content:center; align-items:center; font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;">
+                
+                <div style="background:#fff; width:95%; max-width:700px; max-height:90vh; border-radius:8px; border:1px solid #eaeaea; overflow-y:auto; box-shadow:0 15px 40px rgba(0,0,0,0.08); text-align:center; position:relative; padding:40px 30px;">
+                    
+                    <button id="ulino-ai-close" style="position:absolute; top:20px; right:20px; background:none; border:none; font-size:32px; cursor:pointer; color:#999; line-height:1; z-index:10; font-weight:300; transition:color 0.2s;">&times;</button>
+                    
+                    <h2 style="margin:0 0 12px; color:#000; font-size:24px; font-weight:500; letter-spacing:1px;">ULINO Sanal Kabin</h2>
+                    <p id="ulino-ai-subtitle" style="color:#666; margin-bottom:30px; font-size:15px; font-weight:300;">Seçtiğiniz tasarımı akıllı sanal kabinimizde anında üzerinizde görüntüleyin.</p>
+                    
+                    <div id="ulino-ai-actions" style="display:flex; gap:15px; justify-content:center; flex-wrap:wrap;">
+                        <label style="background:#000; color:#fff; padding:14px 24px; border-radius:4px; cursor:pointer; font-weight:500; flex:1; max-width:220px; font-size:14px; letter-spacing:0.5px; transition:opacity 0.2s;">
+                            Kamerayı Aç
+                            <input type="file" accept="image/*" capture="user" class="ulino-ai-file-input" style="display:none;">
+                        </label>
+                        <label style="background:#fff; color:#000; border:1px solid #000; padding:14px 24px; border-radius:4px; cursor:pointer; font-weight:500; flex:1; max-width:220px; font-size:14px; letter-spacing:0.5px; transition:background 0.2s;">
+                            Fotoğraf Yükle
+                            <input type="file" accept="image/*" class="ulino-ai-file-input" style="display:none;">
+                        </label>
+                    </div>
+
+                    <div id="ulino-ai-loading" style="display:none; margin-top:30px;">
+                        <div style="width:40px; height:40px; border:2px solid #f0f0f0; border-top:2px solid #000; border-radius:50%; animation:ulino-spin 1s linear infinite; margin:0 auto 20px;"></div>
+                        <p style="color:#888; font-size:13px; font-weight:400; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px;">Tahmini Bekleme Süresi: ~20 Saniye</p>
+                        <p style="color:#000; font-weight:500; font-size:16px; margin:0; letter-spacing:0.5px;">Seçtiğiniz parça üzerinize özel olarak uyarlanıyor...</p>
+                        <p style="color:#888; font-size:14px; font-weight:300; margin-top:8px;">Yapay zeka stilinizi oluştururken lütfen kısa bir süre bekleyin.</p>
+                    </div>
+
+                    <div id="ulino-ai-result" style="display:none; margin-top:10px;">
+                        <p style="color:#999; font-size:13px; font-weight:300; margin-bottom:15px; letter-spacing:0.5px;">Kumaş ve duruş detaylarını incelemek için resmin üzerine gelin.</p>
+                        
+                        <div id="ulino-zoom-wrapper" style="display:inline-block; overflow:hidden; border-radius:4px; box-shadow:0 5px 15px rgba(0,0,0,0.05); cursor:zoom-in; position:relative; max-width:100%;">
+                            <img id="ulino-ai-result-img" src="" style="display:block; max-width:100%; max-height:65vh; width:auto; transition: transform 0.2s ease-out; transform-origin: center center;">
+                        </div>
+                        
+                        <br>
+                        <button id="ulino-ai-reset" style="margin-top:25px; background:transparent; border-bottom:1px solid #000; color:#000; padding:5px 0; border-radius:0; cursor:pointer; font-weight:500; font-size:14px; letter-spacing:0.5px;">Farklı Bir Görsel İle Deneyin</button>
+                    </div>
+
+                </div>
+                <style>
+                    @keyframes ulino-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+                    #ulino-ai-close:hover { color: #000 !important; }
+                    #ulino-ai-actions label:hover { opacity: 0.8; }
+                </style>
+            </div>`;
+            $('body').append(modalHTML);
+        }
+
+        // Ana Buton (Minimalist E-Ticaret Tarzı)
+        if ($('.ai-try-on-btn').length == 0) {
+            $('.basketBtn').after('<button type="button" class="ai-try-on-btn" style="background: #000; color: #fff; padding: 12px 20px; border: none; border-radius: 4px; margin-left: 10px; cursor: pointer; font-weight: bold;"><i class="fal fa-magic"></i> SANAL KABİNDE DENE</button>');
+        }
+
+        $('body').off('click', '.ai-try-on-btn').on('click', '.ai-try-on-btn', function(e) {
+            e.preventDefault();
+            $('#ulino-ai-modal').css('display', 'flex').hide().fadeIn(300);
+        });
+
+        $('#ulino-ai-close').on('click', function() {
+            $('#ulino-ai-modal').fadeOut(300);
+        });
+
+        $('#ulino-ai-reset').on('click', function() {
+            $('#ulino-ai-result').hide();
+            $('#ulino-ai-loading').hide();
+            $('#ulino-ai-actions').fadeIn(300);
+            $('#ulino-ai-subtitle').fadeIn(300);
+        });
+
+        // --- MERCEK (ZOOM) ÖZELLİĞİ ---
+        $('#ulino-zoom-wrapper').on('mousemove', function(e) {
+            let wrapper = $(this);
+            let img = $('#ulino-ai-result-img');
+            let offset = wrapper.offset();
+            
+            let x = e.pageX - offset.left;
+            let y = e.pageY - offset.top;
+            let xPercent = (x / wrapper.width()) * 100;
+            let yPercent = (y / wrapper.height()) * 100;
+            
+            img.css({
+                'transform-origin': xPercent + '% ' + yPercent + '%',
+                'transform': 'scale(2.0)'
+            });
+        }).on('mouseleave', function() {
+            $('#ulino-ai-result-img').css({
+                'transform-origin': 'center center',
+                'transform': 'scale(1)'
+            });
+        });
+
+        // --- DOSYA YÜKLEME VE AI İŞLEMİ ---
+        $('.ulino-ai-file-input').on('change', function() {
+            let file = this.files[0];
+            if (!file) return;
+
+            // [OTOMATİK RESİM YAKALAMA]
+            // Ticimax'ta ana vitrin resmi genellikle #imgUrunResim ID'sindedir.
+            let productImgUrl = $('#imgUrunResim').attr('src') || $('.leftImage img').first().attr('src');
+            
+            // Eğer resim linki /Uploads/... gibi eksik gelirse domain ekleyelim
+            if (productImgUrl && !productImgUrl.startsWith('http')) {
+                productImgUrl = window.location.protocol + "//" + window.location.hostname + productImgUrl;
+            }
+
+            // Hata Kontrolü: Eğer hala resim bulamazsak (Çok düşük ihtimal)
+            if (!productImgUrl) {
+                alert("Ürün görseli algılanamadı. Lütfen sayfayı yenileyip tekrar deneyin.");
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append('user_photo', file);
+            formData.append('product_url', productImgUrl);
+
+            // Görüntüleme ayarları
+            $('#ulino-ai-actions').hide();
+            $('#ulino-ai-subtitle').hide();
+            $('#ulino-ai-loading').fadeIn(300);
+
+            // API Gönderimi
+            fetch('https://api.hakangold.com/deneme-yap', {
+                method: 'POST',
+                mode: 'cors',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                $('#ulino-ai-loading').hide();
+                if (data.status === "success") {
+                    $('#ulino-ai-result-img').attr('src', data.image_data);
+                    $('#ulino-ai-result').fadeIn(300);
+                } else {
+                    alert("Görseliniz işlenirken küçük bir pürüz oluştu. Lütfen yüzünüzün net göründüğü farklı bir fotoğraf ile tekrar deneyin.");
+                    $('#ulino-ai-reset').click();
+                }
+            })
+            .catch(error => {
+                console.error('Hata:', error);
+                alert("Şu anda sanal kabin sistemimizde yoğunluk yaşanmaktadır. Lütfen kısa bir süre sonra tekrar deneyin.");
+                $('#ulino-ai-loading').hide();
+                $('#ulino-ai-actions').fadeIn(300);
+            })
+            .finally(() => {
+                $(this).val(''); 
+            });
+        });
+        // ========================================================
+        // ULINO AI SANAL KABİN SİSTEMİ BİTİŞİ
+        // ========================================================
+    }
+}
+function topMenuCallback() {
+    $('#instaStories').insertAfter('.mycart');
+    if ($('.homeHeader').length>0) {$('body').addClass('homeBody');}
+    HeaderFixed();
+    $(".navUl li").each(function () {if ($(this).find("ul").length > 0) {$(this).addClass("ulVar"); }});
+    var menuwidth = $('.navigation .navUl').width();
+    if (menuwidth > 1000 || $('.navigation .navUl > li').length > 10 || windowidth<1340) {
+        mobileMenu();
+    }else{
+        $('.navigation .navUl > li.ulVar').each(function(){
+            $(this).find('> ul').wrapAll('<div class="Flexscroll"></div>');
+        });
+    }
+    if (windowidth < 1500) {
+        if (menuwidth > 900) {mobileMenu();}
+    }
+}
+
+function blockCompleteCallback() {
+    if (globalModel.pageType == 'homepage') {
+    }
+    if ($('#divSayfalamaUst').length>0) {
+    }
+    if (globalModel.pageType == 'productdetail') {
+        UrunDetayPaylas();
+        $('#linkOncekiSayfa').appendTo('ul.breadcrumb');
+        if (!pageInitialized) {
+            $('#linkOncekiSayfa').appendTo('ul.breadcrumb');
+            if (windowidth<768) {
+                var cList = $('.urunTab ul li'); var cDiv = $('.urunDetayPanel'); for (var i = 0; i <= cList.length; i++) {for (var i = 0; i <= cDiv.length; i++) {$(cDiv[i]).appendTo(cList[i]); } } $(".urunDetayPanel").hide() ;
+                $(".urunTab").removeAttr('class').addClass("mobilTab");
+                $('#linkOncekiSayfa').appendTo('.leftImage');
+            }
+        }
+        $('body').on('click','.mobilTab >ul>li>a',function () {
+            var openTab = $(this);
+            if ($(this).parent().hasClass('active')) {$('.mobilTab >ul>li>a').parent().removeClass('active');}
+            else {$('.mobilTab >ul>li>a').parent().removeClass('active');$(this).parent().addClass('active');}
+            var tabName = openTab.attr('data-tab') || "";if (tabName === "Commets") {TabGetComments();}else if (tabName === "recommendations") {TabGetRecommendations();}
+        });
+    }
+}
+function urunListCallback() {
+    
+    
+    if (globalBlokModel == 1) {
+        if (urunDuzeniTipi == 0) urunDuzeniTipi = 3; $('.leftBlock').removeClass().addClass('leftBlock LeftMiddle'); $('.centerCount').removeClass().addClass('centerCount LeftMiddle');
+    }
+    else if (globalBlokModel == 2) {
+        if (urunDuzeniTipi == 0) urunDuzeniTipi = 2; $('.leftBlock').removeClass().addClass("leftBlock LeftMiddleRight"); $('.rightBlock').removeClass().addClass("rightBlock LeftMiddleRight"); $('.centerCount').removeClass().addClass("centerCount LeftMiddleRight");
+    }
+    else if (globalBlokModel == 3) {
+        if (urunDuzeniTipi == 0) urunDuzeniTipi = 4; $('.rightBlock').removeClass().addClass("rightBlock MiddleRight"); $('.centerCount').removeClass().addClass("centerCount MiddleRight");
+    }
+    else if (globalBlokModel == 4) {
+        if (urunDuzeniTipi == 0) urunDuzeniTipi = 3; $('.centerCount').removeClass().addClass("centerCount Middle");
+    }
+    if ($('.blockSelect').length>0) {
+        $('body').on('click', '.blockSelect .sort_hrz',function(){urunDuzeniTipi = 1;urunDuzeni(urunDuzeniTipi); }); $('body').on('click', '.blockSelect .sort_2',function(){urunDuzeniTipi = 2;urunDuzeni(urunDuzeniTipi); }); $('body').on('click', '.blockSelect .sort_3',function(){urunDuzeniTipi = 3;urunDuzeni(urunDuzeniTipi); }); $('body').on('click', '.blockSelect .sort_4',function(){urunDuzeniTipi = 4;urunDuzeni(urunDuzeniTipi); }); $('body').on('click', '.blockSelect .sort_5',function(){urunDuzeniTipi = 5;urunDuzeni(urunDuzeniTipi);});
+    }
+    if ($('.leftBlock .sliderBannerContainer,.rightBlock .sliderBannerContainer').length>0) {$('.leftBlock .sliderBannerContainer,.rightBlock .sliderBannerContainer').addClass('leftRightSlide'); }
+    $('.sliderBannerContainer:not(.NoSlider,.leftRightSlide) .jCarouselLite ul').each(function () {
+        if ($(this).find("li").length > 0 && !$(this).hasClass("owl-carousel"))
+            $(this).owlCarousel({
+                autoplay: false,
+                loop: false,
+                autoplayTimeout: 2000,
+                navClass: ['ProductListprev', 'ProductListnext'],
+                autoplaySpeed: 800,
+                autoplayHoverPause: true,
+                margin:20,
+                nav: true,
+                lazyLoad:true,
+                responsive: {0: {items: 2,autoplay: false,loop: true, margin: 5 }, 768:  {items: 3}, 1025:  {items: 3}, 1042: {items: 4},1200: {items: 4}}
+            });
+    });
+    $('.leftBlock .jCarouselLite ul').each(function () {if ($(this).find("li").length > 0 && !$(this).hasClass("owl-carousel")) $(this).owlCarousel({rewind: true, margin: 10, nav: false, lazyLoad:true, responsive:{0: {items: 1},}, onInitialized: function callback() {lazyLoad(); } }); });
+    $('.rightBlock .jCarouselLite ul').each(function () {if ($(this).find("li").length > 0 && !$(this).hasClass("owl-carousel")) $(this).owlCarousel({rewind: true, margin: 10, nav: false, lazyLoad:true, responsive:{0: {items: 1},}, onInitialized: function callback() {lazyLoad(); } }); });
+    urunDuzeni(urunDuzeniTipi);
+    if (globalModel.pageType == 'homepage'){
+    }
+    if ($('#divSayfalamaUst').length>0) {
+    }
+    if (globalModel.pageType == 'productdetail') {
+        if($('#divSatinAl').css('display') == 'none'){$('.RightDetail').addClass('StokYok') }
+            $('.centerCount .detaySliderContainer:not(#divIlgiliUrunler) .jCarouselLite ul').each(function () {
+                if ($(this).find("li").length > 0 && !$(this).hasClass("owl-carousel"))
+                    $(this).owlCarousel({
+                        autoplay: false,
+                        loop: false,
+                        autoplayTimeout: 2000,
+                        navClass: ['ProductListprev', 'ProductListnext'],
+                        autoplaySpeed: 800,
+                        autoplayHoverPause: true,
+                        margin:20,
+                        nav: true,
+                        lazyLoad:true,
+                        responsive: {0: {items: 2,autoplay: true,loop: true, margin: 5 }, 768:  {items: 3}, 1025:  {items: 3}, 1042: {items: 4},1200: {items: 4}}
+                    });
+            });
+        $('#IlgiliUrunDiv').insertBefore('#divUrunEkSecenek');
+        if ($('.resimlivaryasyon').length>0) {
+            $('.TopDet #IlgiliUrunDiv .JKatAdi .bold .satir1').html($('#divUrunEkSecenek .eksecenekLine.resimlivaryasyon .left_line').text());
+        }
+    }
+    urunKartCallBack();
+    $(window).on('scroll',function () {
+        if ($('.jCarouselLite[data-lazy-function]').length > 0) { lazyLoad(); }
+    });
+}
+function urunDuzeni(tip) {
+    if ($('#divSayfalamaUst').length>0) {
+        if ($('.blockSelect .sort_5').length==0) {$('.blockSelect .sort_4').after('<a href="javascript:;" class="sort_5"><i class="fas fa-th"></i></a>');}
+        if ($('.blockSelect .sort_2').length==0) {$('.blockSelect .sort_3').before('<a href="javascript:;" class="sort_2"><i class="fas fa-th-large"></i></a>');}
+        if ($('.brandlistselection select').length > 0) {$('#divSayfalamaUst').addClass('Slct');}
+        $('.sort_hrz').removeClass("Active"); 
+        $('.sort_2').removeClass("Active");
+        $('.sort_3').removeClass("Active");
+        $('.sort_4').removeClass("Active");
+        $('.sort_5').removeClass("Active");
+        if (tip == 1) {$('.ProductList:not(.markaSlider)').removeClass().addClass('ProductList PlSc_hrz'); $(".ItemOrj").removeClass().addClass("ItemOrj col-12"); $('.blockSelect .sort_hrz').addClass("Active"); lazyLoad();}
+        else if (tip == 2) {$('.ProductList:not(.markaSlider)').removeClass().addClass('ProductList PlSc_2'); $(".ItemOrj").removeClass().addClass("ItemOrj col-6"); $('.blockSelect .sort_2').addClass("Active"); lazyLoad();}
+        else if (tip == 3) {$('.ProductList:not(.markaSlider)').removeClass().addClass('ProductList PlSc_3'); $(".ItemOrj").removeClass().addClass("ItemOrj col-4"); $('.blockSelect .sort_3').addClass("Active"); lazyLoad();}
+        else if (tip == 4) {$('.ProductList:not(.markaSlider)').removeClass().addClass('ProductList PlSc_4'); $(".ItemOrj").removeClass().addClass("ItemOrj col-3"); $('.blockSelect .sort_4').addClass("Active"); lazyLoad();}
+        else if (tip == 5) {$('.ProductList:not(.markaSlider)').removeClass().addClass('ProductList PlSc_5'); $(".ItemOrj").removeClass().addClass("ItemOrj col-5li"); $('.blockSelect .sort_5').addClass("Active"); lazyLoad();}
+        else if (tip == 6) {$('.ProductList:not(.markaSlider)').removeClass().addClass('ProductList PlSc_6'); $(".ItemOrj").removeClass().addClass("ItemOrj col-2"); lazyLoad(); }
+
+        if (windowidth < 1042) {
+            if ($('.FiltreUst').length == 0) {
+                $('body #divSayfalamaUst .category-vertical-filters.top-filters').prepend('<div class="tukgo"><a onclick="sortingClick(1000)" class="filterOrderInStock">'+translateIt("Urunler_Stoktakiler")+'</a></div>');
+                $('body #divSayfalamaUst .category-vertical-filters.top-filters').prepend('<div class="FiltreUst"><div class="closeFilt"><i class="fal fa-times"></i></div><span>'+translateIt("UrunFiltreleme_Filtreleme")+'</span><a onclick="clearAllFilters()"><i class="fal fa-trash-alt"></i></a></div>');
+                if ($('.moreNum').length==0) {
+                    $('#divSayfalamaUst .category-vertical-filters.top-filters .panel').find('.panel-heading').append('<div class="moreNum"></div>');
+                }
+                $('body').on('click','.mobilFilterBtn',function(event) {
+                    $('.mobilaf').addClass('acik');
+                    $('#divSayfalamaUst .filterBlock').addClass('active');
+                });
+                $('body').on('click','.closeFilt',function(event) {
+                    $('.mobilaf').removeClass('acik');
+                    $('#divSayfalamaUst .filterBlock').removeClass('active');
+                });
+                $('#divSayfalamaUst .category-vertical-filters.top-filters .panel').each(function(index, el) {
+                    if ($(this).find('li').hasClass('selected')) {var numlen = $(this).find('li.selected').length; $(this).addClass('more'); $(this).find('.moreNum').html(numlen);}
+                    else{$(this).removeClass('more'); $(this).find('.moreNum').html(''); }
+                });
+                $('#divSayfalamaUst .category-vertical-filters.top-filters .panel').each(function(index, el) {
+                    if ($('#divSayfalamaUst .category-vertical-filters.top-filters .panel').hasClass('more')) {$('.FiltreUst a').addClass('active'); return false; }
+                    else{$('.FiltreUst a').removeClass('active'); }
+                });
+                if ($('.sortingContent .filterOrderInStock').hasClass('selected')) {$('.tukgo .filterOrderInStock').addClass('selected');}else{$('.tukgo .filterOrderInStock').removeClass('selected');}
+                if ($('.sortingContent .sortingButton').length > 0) {if ($('.sortingContent .sortingButton > a[onclick="sortingClick(1000)"]').hasClass('selected')) {$('.tukgo .filterOrderInStock').addClass('selected'); }else {$('.tukgo .filterOrderInStock').removeClass('selected'); } }
+            }
+        }
+        
+    }
+    if (globalModel.pageType == 'productdetail') {if ($('#divUrunKodu span').length==0) {$('#divUrunKodu').append('<span>'+translateIt("Global_StokKodu")+'</span>'); } }
+}
+function ekSecenekListesiCallBack(){
+    if (globalModel.pageType == 'productdetail') {if ($('#divUrunKodu span').length==0) {$('#divUrunKodu').append('<span>'+translateIt("Global_StokKodu")+'</span>'); } }
+}
+function mobileMenu() {
+    if (windowidth>767) {$('#header,body').addClass('MoreMenu');}
+    var menuKopya = $('.navigation').html();
+    $('.navigation').hide();
+    
+    $('.headerContent').prepend('<div class="mobilMenuAcButton"><span>MENU</span><i class="fal fa-bars"></i></div>');
+    
+    $('body').prepend('<div class="mobilaf"></div>');
+    if (windowidth<768) {
+        $('.headerContent').prepend('<div class="mycartClick"><i class="fal fa-shopping-cart"></i></div>');
+        $('#divIcerik').on('touchend',function(){$('.welcome').removeClass('active'); $('.searchContent').removeClass('active'); });
+        $('body').on('click','.searchClick',function () {$('.searchContent').toggleClass('active'); $('.mobilMenu').removeClass('acik'); $('.altMenu').removeClass('active'); $('.ResimliMenu1AltUl').removeClass('active'); $('.mobilMenu .KatMenu1 > li ul').removeClass('active'); $('.mobilMenu .navUl ul').removeClass('active'); $('.mobilMenu .lfMenuAltContent').removeClass('active'); $('.mobilAcilirMenu').html('<i class="fal fa-angle-right"></i>'); $('.CartProduct').removeClass('animated'); $('.welcome').removeClass('active'); $('#lang_flag_container').removeClass('selector'); $('#txtbxArama').focus(); });
+        $('body').on('click','.welcomeOpen',function () {$('.welcome').toggleClass('active'); $('.mobilMenu').removeClass('acik'); $('.altMenu').removeClass('active'); $('.ResimliMenu1AltUl').removeClass('active'); $('.mobilMenu .KatMenu1 > li ul').removeClass('active'); $('.mobilMenu .navUl ul').removeClass('active'); $('.mobilMenu .lfMenuAltContent').removeClass('active'); $('.mobilAcilirMenu').html('<i class="fal fa-angle-right"></i>'); $('.CartProduct').removeClass('animated'); $('.searchContent').removeClass('active'); $('#lang_flag_container').removeClass('selector'); });
+        
+    }
+    $('body').on('click','.mobilMenuAcButton',function () {
+        if ($('.mobilMenu').length==0) {
+            $('body').prepend('<div class="mobilMenu"><div class="menuUstBolum"><div class="mobilMenuBT"><i class="fal fa-bars"></i><span>MENU</span></div><div class="CloseBtnMenu"><i class="far fa-times"></i></div></div><div class="menuIcerikAlan">' + menuKopya + '</div>');
+            if ($('.HeaderMenu2').length>0) {
+                $('.mobilMenu .HeaderMenu2 > li > ul').closest('li').append('<div class="ResimsizDown"><i class="fal fa-angle-right"></i></div>');
+                $('.mobilMenu .HeaderMenu2 > li > ul li ul').closest('li').append('<div class="ResimsizDown2"><i class="fal fa-angle-right"></i></div>');
+                $('body').on('click','.ResimsizDown',function() {if ($(this).find('.fal').hasClass('fa-angle-right')) {$(this).closest('li').find('> ul').addClass('active'); } else {$(this).closest('li').find('> ul').removeClass('active'); } });
+                $('body').on('click','.ResimsizDown2',function() {if ($(this).find('.fal').hasClass('fa-angle-right')) {$(this).closest('li').find('> ul').addClass('active');$(this).closest('ul').addClass('over'); } else {$(this).closest('li').find('> ul').removeClass('active');$(this).closest('ul').removeClass('over'); } });
+                $('.ResimsizDown').each(function(index, el) {var Down1 = $(this).parent('li').find('>a').text(); $(this).closest('li').find('> ul').prepend('<span><div class="NoiBack"><i class="fal fa-long-arrow-left"></i></div> <span>'+Down1+'</span></span>'); });
+                $('.ResimsizDown2').each(function(index, el) {var Down2 = $(this).parent('li').find('>a').text(); $(this).closest('li').find('> ul').prepend('<span><div class="NoiBack2"><i class="fal fa-long-arrow-left"></i></div> <span>'+Down2+'</span></span>'); });
+                $('body').on('click','.NoiBack2',function() {$(this).parent().parent().removeClass('active');$(this).closest('.over').removeClass('over'); $('.mobilMenu .navUl > li > ul').animate({scrollTop:0},100); $('.menuIcerikAlan').animate({scrollTop:0},100); });
+                $('body').on('click','.NoiBack',function() {$('.mobilMenu .navUl > li > ul').removeClass('active'); $('.menuIcerikAlan').animate({scrollTop:0},100); });
+            }
+        }
+
+        $('body').addClass('overflow transform'); 
+        setTimeout(function () {
+            $('.mobilMenu').addClass('acik');
+        },25)
+        $('.mobilaf').addClass('acik').removeAttr('style');; $('.CartProduct').removeClass('animated'); $('.welcome').removeClass('active'); $('.searchContent').removeClass('active'); $('#lang_flag_container').removeClass('selector'); 
+    });
+    $('body').on('click','.mobilaf,.CloseBtnMenu',function () {$('body').removeClass('overflow transform'); $('.mobilMenu').removeClass('acik'); $('.altMenu').removeClass('active'); $('.ResimliMenu1AltUl').removeClass('active'); $('.mobilMenu .KatMenu1 > li ul').removeClass('active'); $('.mobilMenu .navUl ul').removeClass('active'); $('.mobilMenu .lfMenuAltContent').removeClass('active'); $('.mobilAcilirMenu').html('<i class="fal fa-angle-right"></i>'); $('.mobilaf').removeClass('acik').removeAttr('style'); $('.searchContent').removeClass('active'); $('.welcome').removeClass('active'); $('.CartProduct').removeClass('animated'); $('#lang_flag_container').removeClass('selector'); $('body #divSayfalamaUst .filterBlock').removeClass('active'); });
+    $('body').on('click','.mobilMenuBT',function () {$('.mobilMenu .navUl > li').find('ul').removeClass('active over')});
+
+    if (windowidth < 768) {
+        bottomHead();
+    }
+}
+function SepetEkrani() {
+    $('.navigation .navUl').wrapAll('<div></div>');
+    $('.Mic').insertAfter('.navUl');
+    setTimeout(function(){var wle = $('.welcome').html(); $('.welcome').html(''); $('.welcome').append('<div>'+wle+'</div>'); },1500);
+    if ($('.sepett').find('div').length>0) {$('.mycart').addClass('more');}
+    if ($('.BasketDetailCargo').length>0) {$('.mycart').addClass('more');}
+    if ($('.odemeMenuContent').length>0) {$('.mycart').addClass('more');}
+    urunKartCallBack();
+}
+function HesabimTakip() {
+    $('body').addClass('HesabimTakip');
+}
+function Iletisimaspx() {
+    $('body').addClass('Iletisimaspx');
+    var uyead = globalModel.member.memberName;
+    var uyemail = globalModel.member.memberEMail;
+    $('#mainHolder_txtbxAdSoyad').attr('value',uyead);
+    $('#mainHolder_txtbxMail').attr('value',uyemail);
+    $('.iletisimLeft,.iletisimRight').wrapAll('<div class="AdBan"></div>');
+    $('.iletisimForm').insertAfter('.AdBan');
+    $('.iletisimLeftAdres').insertAfter('.iletisimLeftFirmaAdi');
+}
+function UrunDetayPaylas () {
+    var title = $(".ProductName h1 span").text();
+    var url = window.location.href;
+    var image = "http://" + location.host + "" + $('.Images #imgUrunResim').attr('src') + "";
+    var description = "";
+    $('body').on('click',".product_social_icons",function () {
+        if ($(this).attr("content") == "facebook") {
+            if (isMobileDevice()) {
+                window.open("http://m.facebook.com/sharer.php?u=" + url + "");
+            } else {
+                window.open("http://www.facebook.com/sharer.php?s=100&p[medium]=100&p[title]=" + $.trim(title) + "&p[images][0]=" + image + "&p[url]=" + url + "&p[summary]=" + $.trim(title) + "&t=" + $.trim(title) + "", "sharer", "toolbar=0,status=0,width=630,height=430");
+            }
+        } else if ($(this).attr("content") == "twitter") {
+            window.open("http://twitter.com/intent/tweet?text=" + $.trim(title) + "&url=" + url + "", "sharer", "toolbar=0,status=0,width=630,height=430");
+        } else if ($(this).attr("content") == "googleplus") {
+            window.open("https://plus.google.com/share?url=" + url + "", "sharer", "toolbar=0,status=0,width=630,height=430");
+        } else if ($(this).attr("content") == "pinterest") {
+            window.open("http://pinterest.com/pin/create/button/?url=" + url + "&media=" + image + "&description=" + $.trim(title) + "", "sharer", "toolbar=0,status=0,width=630,height=430");
+        }
+    });
+}
+function sepetBindRefresh(res){
+    if (typeof res.cart.products != 'undefined') {if (res.cart.products.length>0) {$('.mycart').addClass('more');$('.CartProduct').addClass('more'); $('.SepetBlock').addClass('more'); } else {$('.mycart').removeClass('more');$('.CartProduct').removeClass('more'); $('.SepetBlock').removeClass('more'); } }
+
+    if (windowidth<768) {
+        $('.mycart > a').removeAttr('href');
+        if ($(".SepetUst").length == 0){
+            $('.CartProduct').prepend('<div class="SepetUst"><div class="seClose"><i class="fal fa-times"></i></div><span>' + translateIt("GlobalMasterPage_Sepetim") + '</span></div>');
+        }
+    }
+    if ($('.CartProduct span').hasClass('spanustSepetteUrunYok')) { $('.CartProduct').addClass('SepetBos'); }
+
+    $("body").on("click", ".mycartClick,.mycart .sepetUrunSayisi", function () { $('.mobilMenu').removeClass('acik'); $('.CartProduct').addClass('animated'); $('.mobilMenu').removeClass('acik'); $('.altMenu').removeClass('active'); $('.ResimliMenu1AltUl').removeClass('active'); $('.mobilMenu .KatMenu1 > li ul').removeClass('active'); $('.mobilMenu .navUl ul').removeClass('active'); $('.mobilMenu .lfMenuAltContent').removeClass('active'); $('.mobilAcilirMenu').html('<i class="fal fa-angle-right"></i>'); $('.searchContent').removeClass('active'); $('.welcome').removeClass('active'); $('#lang_flag_container').removeClass('selector'); });
+
+}
+
+$(document).on("click",".seClose", function () { $('body').removeClass('overflow transform'); $('.mobilMenu').removeClass('acik'); $('.altMenu').removeClass('active'); $('.ResimliMenu1AltUl').removeClass('active'); $('.mobilMenu .KatMenu1 > li ul').removeClass('active'); $('.mobilMenu .navUl ul').removeClass('active'); $('.mobilMenu .lfMenuAltContent').removeClass('active'); $('.mobilAcilirMenu').html('<i class="fal fa-angle-right"></i>'); $('.mobilaf').removeClass('acik').removeAttr('style'); $('.searchContent').removeClass('active'); $('.welcome').removeClass('active'); $('.CartProduct').removeClass('animated'); $('#lang_flag_container').removeClass('selector'); $('body #divSayfalamaUst .filterBlock').removeClass('active'); });
+$(window).on('load',function() {
+    urunKartCallBack();
+    if ($(".hesabimBolumuTutucu").length > 0) { HesabimTakip(); }
+    if ($(".iletisimContent").length > 0) { Iletisimaspx(); }
+});
+$(document).ajaxComplete(function() {FavoriIslemCallback(); });
+function FavoriIslemCallback(){
+    var favSayi = GetFavoriListe().length;
+    if (windowidth>767) {$('.favi span').text(favSayi);
+}else{$('.favNum').text(favSayi); }
+}
+function HeaderFixed() {
+    if ($(".sepetimBody").length == 0) {
+        $(window).on('scroll',function () {
+            if (windowidth > 767) {if ($(this).scrollTop() > 0){$('#header').addClass('fixed'); if (globalModel.pageType !== 'homepage'){$('body').addClass('margin'); } } else {$('#header').removeClass('fixed'); if (globalModel.pageType !== 'homepage'){$('body').removeClass('margin'); } }
+        }else{if (globalModel.pageType == 'homepage'){if ($(this).scrollTop() > 115){$('#header').addClass('touched'); }else{$('#header').removeClass('touched'); } } }
+    });
+    }
+}
+function tooltips(){
+    $('.ProductIcon > div > a').attr('SC_toolTip','SC_toolTip');
+    $('.ProductIcon > div > a').attr('data-placement','bottom');
+    $('.ProductIcon > div > a').each(function(index, el) {
+        if ($(this).find('.box1').attr('title') != undefined) {
+            $(this).attr('title',$(this).find('.box1').attr('title'))
+        }
+        if ($(this).attr('SC_toolTip') == 'SC_toolTip' && $(this).find('.tooltip').length==0) {
+            var titleInner = $(this).attr('title');
+            var position = $(this).attr('data-placement');
+            $(this).append('<div class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner">'+titleInner+'</div></div>');
+            $(this).find('.tooltip').addClass(position);
+            var thisheight = $(this).find('.tooltip').height();
+            var thiswidth = $(this).find('.tooltip').width();
+            if ($('.tooltip').hasClass('right') || $('.tooltip').hasClass('left')) {$(this).find('.tooltip').css('margin-top',-thisheight/2); }
+            if ($('.tooltip').hasClass('top') || $('.tooltip').hasClass('bottom')) {$(this).find('.tooltip').css('margin-left',-thiswidth/2); }
+        }
+    });
+    $('.ProductIcon > div > a').mouseenter(function(event) {$(this).find('.tooltip').addClass('in'); });
+    $('.ProductIcon > div > a').mouseleave(function(event) {$(this).find('.tooltip').removeClass('in'); });
+}
+
+var mobFtrScrollCtrl = false;
+function mobilFooter(){
+    window.blockMenuHeaderScroll = false; $(window).on('touchstart', function(e) {if ($(e.target).closest('.owl-grab').length == 1) {blockMenuHeaderScroll = true;}}); $(window).on('touchend', function() {blockMenuHeaderScroll = false;}); $(window).on('touchmove', function(e) {if (blockMenuHeaderScroll) {e.preventDefault();}}); 
+    if (windowidth<768 && !mobFtrScrollCtrl) {
+        $('.linkler .blink > ul > li > span').append('<div class="ackapabtn"><i class="fal fa-plus"></i></div>');
+        $('.linkler .blink > ul > li > span').on("click",function () {
+            if ($(this).find('.fal').hasClass('fa-plus')) {
+                $('.linkler .blink > ul > li').find('> ul').slideUp('fast');
+                $('.linkler .blink > ul > li').find('.ebultenDiv').slideUp('fast');
+                $('.linkler .blink > ul > li .ackapabtn').html('<i class="fal fa-plus"></i>');
+                $(this).closest('li').find('>ul').slideDown('fast');
+                $(this).closest('li').find('.ebultenDiv').slideDown('fast');
+                $(this).find('.ackapabtn').html('<i class="fal fa-minus"></i>');
+            } else {
+                $(this).find('.ackapabtn').html('<i class="fal fa-plus"></i>');
+                $(this).closest('li').find('> ul').slideUp('fast');
+                $(this).closest('li').find('.ebultenDiv').slideUp('fast');
+            }
+        });
+        mobFtrScrollCtrl = true;
+    }
+}
+var mobtmScrollCtrl = false;
+function bottomHead() {
+    if (!mobtmScrollCtrl && $('.bottomHead').length==0) {
+        $('body:not(.sepetimBody)').append('<div class="bottomHead"> <ul> <li class="homeC"> <a href="/"><i class="fal fa-home"></i><span>'+translateIt("GlobalMasterPage_Anasayfa")+'</span></a> </li> <li class="favoC"> <a href="javascript:void(0)" onclick="GirisKontrol(0)"><i class="fal fa-heart"></i><span>'+translateIt("Favorilerim_Baslik")+'</span><div class="favNum"></div></a> </li> <li class="cartC"> <a href="/sepetim.aspx"><i class="fal fa-shopping-cart"></i><span>'+translateIt("GlobalMasterPage_Sepetim")+'</span></a> </li> <li class="welcC"> <a href="javascript:void(0)" onclick="GirisKontrol(0)"><i class="fal fa-user"></i><span>'+translateIt("GlobalMasterPage_MobilUyeGirisi")+'</span></a> </li> </ul> </div>');
+        if (siteSettings.isAuthenticated == true) {$('.welcC a').attr('href','/hesabim.aspx'); $('.favoC a').attr('href','/Hesabim.aspx/#/Favorilerim'); $('.welcC span').html(translateIt("GlobalMasterPage_MobilHesabim")); }
+        var mobtmScrollCtrl = true;
+    }
+    
+}
+
+$(window).on("scroll", function() {
+    
+    mobilFooter();
+});
+function sayfaTasarim() {
+    if ($('#mainHolder_divDesign').length>0) {
+        urunKartCallBack();
+    }
+}
+function urunKartCallBack() {
+    $(".productItem").find("video").parent().addClass("Videolu");
+    $(".productItem").find(".TukendiIco").parent().addClass("StokYok");
+    $(".productPrice").find(".regularPrice").parent().addClass("IndirimVar");
+    $(".sliderBannerContainer .productItem").find("video").parent().addClass("Videolu");
+    $( ".productItem").each(function( index ) {if ($(this).find('.divVideoPlayButton').length>0) {$(this).find('.divVideoPlayButton').insertAfter($(this).find('.productDetail')); } });
+    if (typeof InitTimers != "undefined") {
+        InitTimers();
+    }
+}
