@@ -183,8 +183,7 @@ async def ai_try_on(user_photo: UploadFile = File(...), product_url: str = Form(
         
         print("AI modeline gönderildi, yanıt bekleniyor...")
         response = client.models.generate_content(
-            #model="models/nano-banana-pro-preview", 
-            model="models/gemini-2.0-flash", 
+            model="models/nano-banana-pro-preview", 
             contents=[master_prompt, user_img, model_img],
             config=types.GenerateContentConfig(
                 safety_settings=safety_config,
